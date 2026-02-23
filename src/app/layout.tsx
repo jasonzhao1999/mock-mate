@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI Interview Question Generator",
+  title: "MockMateAI - AI Interview Question Generator",
   description: "Generate tailored interview questions for any role in seconds. Powered by AI.",
 };
 
