@@ -3,8 +3,32 @@ import { NextRequest, NextResponse } from "next/server";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || "" });
 
+// Simple in-memory rate limiter: 5 requests per minute per IP
+const rateLimit = new Map<string, number[]>();
+const WINDOW_MS = 60 * 1000;
+const MAX_REQUESTS = 5;
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = rateLimit.get(ip) || [];
+  const recent = timestamps.filter((t) => now - t < WINDOW_MS);
+  rateLimit.set(ip, recent);
+
+  if (recent.length >= MAX_REQUESTS) return true;
+  recent.push(now);
+  return false;
+}
+
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.headers.get("x-forwarded-for") || "unknown";
+    if (isRateLimited(ip)) {
+      return NextResponse.json(
+        { error: "Too many requests. Please wait a minute before trying again." },
+        { status: 429 }
+      );
+    }
+
     const { role, level, topic, count } = await request.json();
 
     if (!role || !level) {
