@@ -13,7 +13,7 @@ interface QuestionFormProps {
 }
 
 const levels = ["Junior", "Mid", "Senior"];
-const counts = [3, 5, 8, 10];
+const counts = [3, 5, 10];
 
 export default function QuestionForm({ onGenerate, isLoading }: QuestionFormProps) {
   const [role, setRole] = useState("");
